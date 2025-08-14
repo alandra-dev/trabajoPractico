@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import ttk, messagebox, simpledialog
 from tkinter.font import BOLD
 import utilerias.generico as utl
 from formularios.form_master import PanelPrincipal
@@ -11,6 +11,12 @@ class App:
         self.iniciar_sesion()
     
     def guardar_administrador(self):    
+        clave_maestra = "ElRinconDelSaber123"
+        codigo_ingresado = simpledialog.askstring("Código de Administrador", "Introduce el código secreto:")
+
+        if codigo_ingresado != clave_maestra:
+            return messagebox.showerror("Error", "Código de administrador incorrecto")
+
         administrador = self.usuario_registro.get()
         contrasenia = self.contrasenia_registro.get()
         if not administrador or not contrasenia:
