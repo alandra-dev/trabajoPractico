@@ -1,7 +1,7 @@
 import customtkinter as ctk
 
 from tkinter import messagebox, simpledialog
-from form_panel_administrador import PanelAdministrador
+from form_panel_administrador import PanelAdministrador 
 from form_panel_usuario import PanelUsuario
 from consultas import verificar_admin, verificar_usuario, agregar_administrador, agregar_usuario
 
@@ -14,6 +14,11 @@ class VentanaRegistro(ctk.CTkToplevel):
         super().__init__(master)
         self.title("Registro de Usuario") 
         self.geometry("500x500") 
+
+        self.transient(master) # la fija sobre la ventana padre (login)
+        self.grab_set() # bloquea interacción con la ventana padre
+        self.focus()   # le da el foco
+
 
         #  Entradas
         ctk.CTkLabel(self, text="Nombre de usuario", font=("Segoe UI", 12)).pack(pady=(20, 5)) 

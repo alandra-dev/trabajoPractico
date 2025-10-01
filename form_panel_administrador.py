@@ -23,14 +23,15 @@ class PanelAdministrador: # clase para el panel de administrador
         self.frame_entradas.pack(side="left", fill="both", expand=True, padx=(0,10), pady=10)
 
         self.campos = {}
-        etiquetas = ["ISBN", "Titulo", "Autor", "Anio", "Genero"]
-        # Crea etiquetas y entradas dinámicamente
-        for i, texto in enumerate(etiquetas): # iterador genera las tuplas (índice, valor)
+        etiquetas = [("ISBN", "isbn"), ("Título", "titulo"), ("Autor", "autor"), ("Año", "anio"), ("Género", "genero")]
+
+        for i, (texto, clave) in enumerate(etiquetas): 
             label = ctk.CTkLabel(self.frame_entradas, text=texto, anchor="w", font=("Segoe UI", 12, "bold"))
             label.grid(row=i, column=0, padx=10, pady=10, sticky="w")
             entrada = ctk.CTkEntry(self.frame_entradas, width=300, font=("Segoe UI", 12))
             entrada.grid(row=i, column=1, padx=10, pady=10)
-            self.campos[texto.lower()] = entrada 
+            self.campos[clave] = entrada
+
 
         # Frame de botones
         self.frame_botones = ctk.CTkFrame(self.frame_principal, corner_radius=15)
@@ -93,6 +94,11 @@ class PanelAdministrador: # clase para el panel de administrador
             campo.delete(0, ctk.END)
 
     def cerrar_sesion(self):
-        #Destruye la ventana actual y muestra un mensaje
         self.ventana.destroy()
         messagebox.showinfo("Sesión cerrada", "Has cerrado sesión correctamente")
+        nueva_ventana = ctk.CTk()
+        from form_login import AplicacionLogin
+        AplicacionLogin(nueva_ventana)
+        nueva_ventana.mainloop()
+
+

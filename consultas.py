@@ -79,13 +79,13 @@ def obtener_libros(filtro=None):
     cursor = conexion.cursor()
     if filtro:
         cursor.execute("""
-            SELECT * FROM libros
-            WHERE titulo LIKE ? AND autor LIKE ? AND genero LIKE ? AND isbn LIKE ? AND anio LIKE ?
-        """, (f"%{filtro.get('titulo','')}%",
-              f"%{filtro.get('autor','')}%",
-              f"%{filtro.get('genero','')}%",
-              f"%{filtro.get('isbn','')}%",
-              f"%{filtro.get('anio','')}%"))
+                SELECT * FROM libros
+                WHERE titulo LIKE ? AND autor LIKE ? AND genero LIKE ? AND isbn LIKE ? AND anio LIKE ?
+                """, (f"%{filtro.get('titulo','')}%",
+                f"%{filtro.get('autor','')}%",
+                f"%{filtro.get('genero','')}%",
+                f"%{filtro.get('isbn','')}%",
+                f"%{filtro.get('anio', filtro.get('año',''))}%"))
     else:
         cursor.execute("SELECT * FROM libros")
     resultados = cursor.fetchall()
