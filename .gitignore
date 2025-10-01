@@ -1,0 +1,39 @@
+# Ignorar archivos compilados de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Ignorar bases de datos
+*.db
+*.sqlite3
+
+# Ignorar archivos de configuración generados
+*.log
+*.tmp
+
+# Ignorar archivos de entorno virtual
+venv/
+env/
+.idea/
+.vscode/
+
+# Ignorar archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar PDFs y otras exportaciones del proyecto
+*.pdf
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# Ignorar archivos temporales de formularios
+formularios/__pycache__/
+utilerias/__pycache__/
+
+# Ignorar otros archivos que se regeneran automáticamente
+*.class
+*.o
+*.exe
