@@ -56,14 +56,55 @@ def agregar_libro(isbn, titulo, autor, anio, genero):
     finally:
         conexion.close()
 
-def modificar_libro(isbn, titulo, autor, anio, genero):
+def modificar_libro(isbn, titulo=None, autor=None, anio=None, genero=None):
     conexion = sqlite3.connect("biblioteca.db")
     cursor = conexion.cursor()
-    cursor.execute("UPDATE libros SET titulo=?, autor=?, anio=?, genero=? WHERE isbn=?", (titulo, autor, anio, genero, isbn))
+
+    # Traer datos actuales del libro
+    cursor.execute("SELECT titulo, autor, anio, genero FROM libros WHERE isbn=?", (isbn,))
+    actual = cursor.fetchone()
+    if not actual:
+        conexion.close()
+        return False  # No existe ese ISBN
+
+    # Si el valor viene vacío, conservar el original
+    nuevo_titulo = titulo if titulo else actual[0]
+    nuevo_autor = autor if autor else actual[1]
+    nuevo_anio = anio if anio else actual[2]
+    nuevo_genero = genero if genero else actual[3]
+
+    # Ejecutar update
+    cursor.execute("""
+        UPDATE libros 
+        SET titulo=?, autor=?, anio=?, genero=? 
+        WHERE isbn=?
+    """, (nuevo_titulo, nuevo_autor, nuevo_anio, nuevo_genero, isbn))
+
     conexion.commit()
-    modificado = cursor.rowcount > 0 # Verifica si se modificó algún registro
+    modificado = cursor.rowcount > 0
     conexion.close()
     return modificado
+
+def obtener_libros(filtro=None):
+    conexion = sqlite3.connect("biblioteca.db")
+    cursor = conexion.cursor()
+    if filtro:
+        cursor.execute("""
+            SELECT * FROM libros
+            WHERE titulo LIKE ? AND autor LIKE ? AND genero LIKE ? AND isbn LIKE ? AND anio LIKE ?
+        """, (
+            f"%{filtro.get('titulo','')}%",
+            f"%{filtro.get('autor','')}%",
+            f"%{filtro.get('genero','')}%",
+            f"%{filtro.get('isbn','')}%",
+            f"%{filtro.get('anio', filtro.get('año',''))}%"
+        ))
+    else:
+        cursor.execute("SELECT * FROM libros")
+    resultados = cursor.fetchall()
+    conexion.close()
+    return resultados
+
 
 def eliminar_libro(isbn):
     conexion = sqlite3.connect("biblioteca.db")
@@ -74,23 +115,6 @@ def eliminar_libro(isbn):
     conexion.close()
     return borrado
 
-def obtener_libros(filtro=None):
-    conexion = sqlite3.connect("biblioteca.db")
-    cursor = conexion.cursor()
-    if filtro:
-        cursor.execute("""
-                SELECT * FROM libros
-                WHERE titulo LIKE ? AND autor LIKE ? AND genero LIKE ? AND isbn LIKE ? AND anio LIKE ?
-                """, (f"%{filtro.get('titulo','')}%",
-                f"%{filtro.get('autor','')}%",
-                f"%{filtro.get('genero','')}%",
-                f"%{filtro.get('isbn','')}%",
-                f"%{filtro.get('anio', filtro.get('año',''))}%"))
-    else:
-        cursor.execute("SELECT * FROM libros")
-    resultados = cursor.fetchall()
-    conexion.close()
-    return resultados
 
 #  Favoritos 
 def agregar_favorito(usuario_id, isbn_libro):
@@ -116,6 +140,7 @@ def obtener_favoritos(usuario_id):
     resultados = cursor.fetchall()
     conexion.close()
     return resultados
+
 def eliminar_favorito(usuario_id, isbn_libro):
     conexion = sqlite3.connect("biblioteca.db")
     cursor = conexion.cursor()

@@ -1,9 +1,9 @@
 import customtkinter as ctk
 from tkinter import messagebox, ttk
-from consultas import agregar_libro, modificar_libro, eliminar_libro, obtener_libros
+from consultas import agregar_libro, modificar_libro as modificar_libro_consulta, eliminar_libro, obtener_libros
 
-class PanelAdministrador: # clase para el panel de administrador
-    def __init__(self, ventana, usuario): # recibe la ventana principal y el usuario que inició sesión
+class PanelAdministrador:  # clase para el panel de administrador
+    def __init__(self, ventana, usuario):  # recibe la ventana principal y el usuario que inició sesión
         # Configuración de CustomTkinter
         ctk.set_appearance_mode("system") 
         ctk.set_default_color_theme("blue") 
@@ -32,7 +32,6 @@ class PanelAdministrador: # clase para el panel de administrador
             entrada.grid(row=i, column=1, padx=10, pady=10)
             self.campos[clave] = entrada
 
-
         # Frame de botones
         self.frame_botones = ctk.CTkFrame(self.frame_principal, corner_radius=15)
         self.frame_botones.pack(side="right", fill="y", padx=(10,0), pady=10)
@@ -49,29 +48,40 @@ class PanelAdministrador: # clase para el panel de administrador
         # Crear botones con estilo personalizado
         for texto, comando, color in botones:
             btn = ctk.CTkButton(self.frame_botones, text=texto, command=comando, width=180, height=50,
-                                 fg_color=color, text_color="white", corner_radius=10, font=("Segoe UI", 12, "bold"))
+                                fg_color=color, text_color="white", corner_radius=10, font=("Segoe UI", 12, "bold"))
             btn.pack(pady=15)
 
     # Funciones
     def agregar_libro(self):
-        datos = {k: v.get().strip() for k, v in self.campos.items()} # obtiene los datos de los campos y elimina espacios
-        # Verificación
-        if not datos["isbn"]:
-            messagebox.showwarning("Error", "El ISBN es obligatorio")
+        datos = {k: v.get().strip() for k, v in self.campos.items()}
+        # Verificación de todos los campos
+        if not all(datos.values()):
+            messagebox.showwarning("Error", "Todos los campos son obligatorios")
             return
-         # Llama a la función
-        if agregar_libro(**datos): # añade argumentos individuales
+        if agregar_libro(**datos):
             messagebox.showinfo("Éxito", "Libro agregado correctamente")
             self.limpiar_campos()
         else:
             messagebox.showwarning("Error", "Ya existe un libro con ese ISBN")
 
     def modificar_libro(self):
-        datos = {k: v.get().strip() for k, v in self.campos.items()} 
+        datos = {k: v.get().strip() for k, v in self.campos.items()}
         if not datos["isbn"]:
             messagebox.showwarning("Error", "Ingrese ISBN para modificar")
             return
-        if modificar_libro(**datos):
+
+        # Solo usar los campos que tengan datos
+        palabras_clave = {}
+        for campo in ("titulo", "autor", "anio", "genero"):
+            if datos[campo]:
+                palabras_clave[campo] = datos[campo]
+
+        if not palabras_clave:
+            messagebox.showwarning("Error", "Complete al menos un campo para modificar (Título, Autor, Año, Género).")
+            return
+
+        exito = modificar_libro_consulta(datos["isbn"], **palabras_clave)
+        if exito:
             messagebox.showinfo("Éxito", "Libro modificado correctamente")
             self.limpiar_campos()
         else:
@@ -89,7 +99,6 @@ class PanelAdministrador: # clase para el panel de administrador
             messagebox.showwarning("Error", "No se encontró un libro con ese ISBN")
 
     def limpiar_campos(self):
-        # Limpia todos los campos del formulario
         for campo in self.campos.values():
             campo.delete(0, ctk.END)
 
@@ -100,5 +109,3 @@ class PanelAdministrador: # clase para el panel de administrador
         from form_login import AplicacionLogin
         AplicacionLogin(nueva_ventana)
         nueva_ventana.mainloop()
-
-
